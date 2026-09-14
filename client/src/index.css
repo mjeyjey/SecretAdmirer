@@ -1,0 +1,940 @@
+/* =========================================
+   RESET
+========================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  background: #fff7f8;
+  color: #35161d;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+svg {
+  display: block;
+}
+
+
+/* =========================================
+   APP SHELL
+========================================= */
+
+.app-shell {
+  min-height: 100vh;
+  position: relative;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+
+/* =========================================
+   CREATOR MARK
+========================================= */
+
+.creator-mark {
+  position: fixed;
+  top: 22px;
+  right: 26px;
+  z-index: 10;
+
+  color: #d93656;
+
+  font: bold 15px Arial, sans-serif;
+  letter-spacing: 2px;
+}
+
+.creator-help {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 11;
+
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid #d93656;
+  border-radius: 50%;
+
+  background: #fff;
+  color: #d93656;
+
+  font: bold 22px Georgia, serif;
+
+  box-shadow:
+    0 8px 22px rgba(70, 20, 30, 0.14);
+
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+
+.creator-help:hover,
+.creator-help:focus-visible {
+  background: #d93656;
+  color: #fff;
+
+  transform: translateY(-2px);
+}
+
+.creator-help:focus-visible,
+.creator-note-close:focus-visible {
+  outline: 2px solid #35161d;
+  outline-offset: 3px;
+}
+
+.creator-note {
+  position: fixed;
+
+  right: 24px;
+  bottom: 82px;
+
+  z-index: 10;
+
+  width: min(290px, calc(100vw - 48px));
+
+  padding: 18px 38px 18px 18px;
+
+  border: 1px solid #f0d1d7;
+  border-radius: 14px;
+
+  background: #fff;
+  color: #63323c;
+
+  box-shadow:
+    0 14px 34px rgba(70, 20, 30, 0.16);
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.creator-note-close {
+  position: absolute;
+
+  top: 8px;
+  right: 10px;
+
+  border: none;
+  background: transparent;
+
+  color: #9b5d6b;
+
+  font-size: 22px;
+  line-height: 1;
+}
+
+
+/* =========================================
+   LANDING
+========================================= */
+
+.landing {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  padding: 30px;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #ffe4e9,
+      #fff7f8 60%
+    );
+}
+
+.heart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #d93656;
+
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  letter-spacing: 4px;
+
+  font-size: 12px;
+
+  font-family: Arial, sans-serif;
+
+  color: #9b5d6b;
+
+  margin-bottom: 16px;
+}
+
+.landing h1 {
+  font-size: clamp(60px, 10vw, 120px);
+
+  line-height: 0.85;
+
+  font-weight: normal;
+
+  letter-spacing: -5px;
+}
+
+.subtitle {
+  margin-top: 30px;
+
+  font-size: 18px;
+
+  color: #7b5159;
+}
+
+
+/* =========================================
+   HOME BUTTONS
+========================================= */
+
+.home-buttons {
+  display: flex;
+
+  gap: 15px;
+
+  margin-top: 40px;
+}
+
+.main-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 15px 27px;
+
+  border: 1px solid #d93656;
+  border-radius: 999px;
+
+  background: #d93656;
+  color: white;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.main-action:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px rgba(217, 54, 86, 0.16);
+}
+
+.main-action.outline {
+  background: transparent;
+
+  color: #d93656;
+}
+
+.main-action.outline:hover {
+  background: #fff0f3;
+}
+
+
+/* =========================================
+   EDITOR
+========================================= */
+
+.editor-page {
+  width: min(900px, 94%);
+
+  margin: auto;
+
+  padding: 40px 0 70px;
+}
+
+.editor-header {
+  text-align: center;
+
+  margin-bottom: 30px;
+}
+
+.editor-header h1 {
+  font-size: 42px;
+
+  font-weight: normal;
+}
+
+.editor-header p {
+  margin-top: 10px;
+
+  color: #87636b;
+}
+
+
+/* =========================================
+   BACK BUTTON
+========================================= */
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #a24b5e;
+
+  margin-bottom: 25px;
+
+  transition: opacity 0.2s ease;
+}
+
+.back-button:hover {
+  opacity: 0.7;
+}
+
+
+/* =========================================
+   LETTER
+========================================= */
+
+.editor-card {
+  position: relative;
+}
+
+.letter-input {
+  width: 100%;
+
+  min-height: 420px;
+
+  resize: vertical;
+
+  border: 1px solid #e7cdd2;
+
+  border-radius: 18px;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0,
+      #ffffff 31px,
+      #f4dfe3 32px
+    );
+
+  padding: 30px;
+
+  font-size: 20px;
+
+  line-height: 32px;
+
+  outline: none;
+
+  color: #35161d;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.letter-input::placeholder {
+  color: #b99ba2;
+}
+
+.letter-input:focus {
+  border-color: #d93656;
+
+  box-shadow:
+    0 0 0 3px rgba(217, 54, 86, 0.08);
+}
+
+.character-count {
+  text-align: right;
+
+  font: 12px Arial, sans-serif;
+
+  color: #999;
+
+  margin-top: 8px;
+}
+
+
+/* =========================================
+   DRAWING
+========================================= */
+
+.drawing-wrapper {
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-bottom: 15px;
+}
+
+.toolbar button {
+  border: 1px solid #e6ced3;
+
+  background: white;
+
+  color: #35161d;
+
+  padding: 10px 15px;
+
+  border-radius: 8px;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.toolbar button:hover {
+  background: #fff3f5;
+}
+
+.toolbar button.active {
+  background: #35161d;
+
+  color: white;
+}
+
+.color-group {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.color {
+  width: 30px;
+
+  height: 30px;
+
+  padding: 0 !important;
+
+  border-radius: 50% !important;
+}
+
+.color.red {
+  background: #ff0000;
+}
+
+.color.blue {
+  background: #0000ff;
+}
+
+.color.yellow {
+  background: #ffd600;
+}
+
+.color.black {
+  background: #000000;
+}
+
+.drawing-canvas {
+  display: block;
+
+  width: 100%;
+
+  height: auto;
+
+  background: white;
+
+  border: 1px solid #dfcbd0;
+
+  border-radius: 16px;
+
+  touch-action: none;
+}
+
+
+/* =========================================
+   SWITCH MODE
+========================================= */
+
+.switch-mode {
+  display: flex;
+
+  justify-content: center;
+
+  margin-top: 20px;
+}
+
+.switch-mode button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #b02b4a;
+
+  transition: opacity 0.2s ease;
+}
+
+.switch-mode button:hover {
+  opacity: 0.7;
+}
+
+
+/* =========================================
+   SEND BUTTON
+========================================= */
+
+.send-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  width: 100%;
+
+  margin-top: 30px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 16px;
+
+  background: #d93656;
+
+  color: white;
+
+  font-size: 18px;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  background: #c92e4d;
+
+  box-shadow:
+    0 8px 20px rgba(217, 54, 86, 0.15);
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  background: rgba(30, 10, 15, 0.45);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+}
+
+.modal {
+  position: relative;
+
+  width: min(500px, 100%);
+
+  background: #fff;
+
+  border-radius: 20px;
+
+  padding: 30px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  position: absolute;
+
+  top: 15px;
+  right: 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #35161d;
+}
+
+.modal-close:hover {
+  background: #fff1f4;
+}
+
+
+/* =========================================
+   SEND OPTIONS
+========================================= */
+
+.send-options {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.send-option {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  width: 100%;
+
+  padding: 15px;
+
+  text-align: left;
+
+  border: 1px solid #ead5d9;
+
+  border-radius: 12px;
+
+  background: #fff7f8;
+
+  color: #35161d;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.send-option:hover {
+  border-color: #d93656;
+
+  background: #fff0f3;
+}
+
+
+/* =========================================
+   EMAIL / LINK FORMS
+========================================= */
+
+.email-form,
+.link-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.email-form input,
+.link-form input {
+  width: 100%;
+
+  padding: 14px;
+
+  border: 1px solid #ddd;
+
+  border-radius: 10px;
+
+  outline: none;
+
+  color: #35161d;
+
+  background: #fff;
+}
+
+.email-form input:focus,
+.link-form input:focus {
+  border-color: #d93656;
+
+  box-shadow:
+    0 0 0 3px rgba(217, 54, 86, 0.08);
+}
+
+.primary-button,
+.secondary-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 14px;
+
+  border-radius: 10px;
+}
+
+.primary-button {
+  border: none;
+
+  background: #d93656;
+
+  color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #c92e4d;
+}
+
+.secondary-button {
+  border: 1px solid #ddd;
+
+  background: white;
+
+  color: #35161d;
+}
+
+.secondary-button:hover {
+  background: #fff7f8;
+}
+
+.status-message {
+  text-align: center;
+
+  margin-top: 15px;
+
+  color: #a42d49;
+}
+
+
+/* =========================================
+   RECEIVER
+========================================= */
+
+.receiver-page {
+  min-height: 100vh;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 30px;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #ffe2e8,
+      #fff7f8 65%
+    );
+}
+
+.receiver-card {
+  width: min(700px, 100%);
+
+  padding: 50px;
+
+  text-align: center;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  border: 1px solid #f0dfe2;
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 20px 70px rgba(70, 20, 30, 0.08);
+}
+
+.receiver-card h1 {
+  font-weight: normal;
+
+  font-size: clamp(34px, 5vw, 54px);
+
+  margin-bottom: 30px;
+}
+
+.received-letter {
+  text-align: left;
+
+  padding: 30px;
+
+  background: #fffaf3;
+
+  border-radius: 15px;
+
+  font-family: Georgia, serif;
+
+  font-size: 21px;
+
+  line-height: 1.8;
+
+  white-space: pre-wrap;
+}
+
+.received-drawing img {
+  display: block;
+
+  max-width: 100%;
+
+  width: 100%;
+
+  background: white;
+
+  border-radius: 14px;
+
+  border: 1px solid #eadcdf;
+}
+
+.receiver-footer {
+  margin-top: 30px;
+
+  font-size: 14px;
+
+  color: #916c74;
+}
+
+.loading {
+  font-size: 20px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .creator-mark {
+    top: 16px;
+
+    right: 18px;
+  }
+
+  .creator-help {
+    right: 18px;
+
+    bottom: 18px;
+  }
+
+  .creator-note {
+    right: 18px;
+
+    bottom: 72px;
+  }
+
+  .landing {
+    padding: 25px 20px;
+  }
+
+  .landing h1 {
+    letter-spacing: -3px;
+  }
+
+  .home-buttons {
+    flex-direction: column;
+
+    width: 100%;
+
+    max-width: 300px;
+  }
+
+  .main-action {
+    width: 100%;
+  }
+
+  .editor-page {
+    width: 92%;
+
+    padding-top: 25px;
+  }
+
+  .editor-header h1 {
+    font-size: 32px;
+  }
+
+  .letter-input {
+    min-height: 350px;
+
+    padding: 20px;
+
+    font-size: 18px;
+  }
+
+  .receiver-card {
+    padding: 30px 20px;
+  }
+
+  .received-letter {
+    font-size: 18px;
+
+    padding: 20px;
+  }
+
+  .toolbar {
+    gap: 7px;
+  }
+
+  .toolbar button {
+    padding: 8px 11px;
+  }
+
+}
