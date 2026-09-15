@@ -241,7 +241,7 @@ function Home() {
               />
 
               <span>
-                Switch to Draw Mode
+                Switch to Draw
               </span>
             </button>
 
@@ -313,7 +313,7 @@ function Home() {
               />
 
               <span>
-                Switch to Letter Mode
+                Switch to Letter
               </span>
             </button>
 
