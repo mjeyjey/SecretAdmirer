@@ -67,8 +67,18 @@ router.post("/send-email", async (req, res) => {
     );
 
     if (!usingResend && (!process.env.EMAIL_USER || !process.env.EMAIL_PASS)) {
+      const missingVariables = [];
+
+      if (!process.env.BREVO_API_KEY) {
+        missingVariables.push("BREVO_API_KEY");
+      }
+
+      if (!process.env.EMAIL_FROM) {
+        missingVariables.push("EMAIL_FROM");
+      }
+
       return res.status(500).json({
-        message: "Email service is not configured on the server.",
+        message: `Email service is not configured on the server. Missing: ${missingVariables.join(", ")}.`,
       });
     }
 
