@@ -87,11 +87,7 @@ function Home() {
         imageUrl = filePath;
       }
 
-      const savedType = hasLetter && hasDrawing
-        ? "both"
-        : hasLetter
-          ? "text"
-          : "drawing";
+      const savedType = hasDrawing ? "drawing" : "text";
 
       // ========================================
       // SAVE MESSAGE TO SUPABASE

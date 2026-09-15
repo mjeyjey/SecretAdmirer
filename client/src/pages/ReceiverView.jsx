@@ -24,7 +24,7 @@ function ReceiverView() {
           throw error;
         }
 
-        if ((data.type === "drawing" || data.type === "both") && data.image_url) {
+        if (data.image_url) {
           let filePath = data.image_url;
 
           if (filePath.startsWith("http")) {
@@ -118,13 +118,13 @@ function ReceiverView() {
           </p>
         )}
 
-        {(message.type === "text" || message.type === "both") && (
+        {message.content && (
           <div className="received-letter">
             {message.content}
           </div>
         )}
 
-        {(message.type === "drawing" || message.type === "both") && (
+        {message.image_url && (
           <div className="received-drawing">
             <img
               src={imageUrl}
