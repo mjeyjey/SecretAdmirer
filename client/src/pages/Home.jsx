@@ -245,7 +245,7 @@ function Home() {
               />
 
               <span>
-                Add or edit a drawing
+                Add a drawing
               </span>
             </button>
 
@@ -317,7 +317,7 @@ function Home() {
               />
 
               <span>
-                Add or edit a letter
+                Add a letter
               </span>
             </button>
 
