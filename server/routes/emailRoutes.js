@@ -35,6 +35,9 @@ router.post("/send-email", async (req, res) => {
       port: 587,
       secure: false,
       requireTLS: true,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -113,10 +116,13 @@ router.post("/send-email", async (req, res) => {
 
     const authenticationFailed =
       error.code === "EAUTH" || error.responseCode === 535;
+    const connectionTimedOut = error.code === "ETIMEDOUT";
 
     res.status(500).json({
       message: authenticationFailed
         ? "Email authentication failed. Check the Gmail app password on the server."
+        : connectionTimedOut
+          ? "The email provider could not be reached from the hosting server."
         : `Email provider could not send the message (${error.code || "unknown error"}).`,
     });
 
