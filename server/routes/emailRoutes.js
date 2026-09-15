@@ -32,8 +32,9 @@ router.post("/send-email", async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      port: 587,
+      secure: false,
+      requireTLS: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -116,7 +117,7 @@ router.post("/send-email", async (req, res) => {
     res.status(500).json({
       message: authenticationFailed
         ? "Email authentication failed. Check the Gmail app password on the server."
-        : "Email provider could not send the message.",
+        : `Email provider could not send the message (${error.code || "unknown error"}).`,
     });
 
   }
