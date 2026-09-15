@@ -66,10 +66,14 @@ router.post("/send-email", async (req, res) => {
       !usingBrevo && process.env.RESEND_API_KEY && process.env.EMAIL_FROM
     );
 
-    if (!usingResend && (!process.env.EMAIL_USER || !process.env.EMAIL_PASS)) {
+    const usingGmail = Boolean(
+      process.env.EMAIL_USER && process.env.EMAIL_PASS
+    );
+
+    if (!usingBrevo && !usingResend && !usingGmail) {
       const missingVariables = [];
 
-      if (!process.env.BREVO_API_KEY) {
+      if (!usingBrevo && !process.env.BREVO_API_KEY) {
         missingVariables.push("BREVO_API_KEY");
       }
 
@@ -78,7 +82,7 @@ router.post("/send-email", async (req, res) => {
       }
 
       return res.status(500).json({
-        message: `Email service is not configured on the server. Missing: ${missingVariables.join(", ")}.`,
+        message: `Email service is not configured on the server. Missing: ${missingVariables.join(", ") || "EMAIL_USER or EMAIL_PASS"}.`,
       });
     }
 
