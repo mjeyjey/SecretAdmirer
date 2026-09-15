@@ -8,10 +8,16 @@ const emailRoutes = require("./routes/emailRoutes");
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+const configuredClientUrl = process.env.CLIENT_URL?.trim();
+const clientUrl = configuredClientUrl
+  ? /^https?:\/\//i.test(configuredClientUrl)
+    ? configuredClientUrl
+    : `https://${configuredClientUrl}`
+  : undefined;
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: clientUrl,
   })
 );
 
