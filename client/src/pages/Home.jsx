@@ -18,31 +18,27 @@ function Home() {
 
   const [letter, setLetter] = useState("");
   const [drawing, setDrawing] = useState(null);
+  const [senderName, setSenderName] = useState("");
 
-  const [messageType, setMessageType] = useState(null);
   const [messageId, setMessageId] = useState(null);
 
   const [showSendModal, setShowSendModal] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const startWriting = () => {
-    setMessageType("text");
     setMode("write");
   };
 
   const startDrawing = () => {
-    setMessageType("drawing");
     setMode("draw");
   };
 
   const saveMessage = async () => {
-    if (messageType === "text" && !letter.trim()) {
-      alert("Please write your message first.");
-      return;
-    }
+    const hasLetter = Boolean(letter.trim());
+    const hasDrawing = Boolean(drawing);
 
-    if (messageType === "drawing" && !drawing) {
-      alert("Please draw something first.");
+    if (!hasLetter && !hasDrawing) {
+      alert("Please add a letter, a drawing, or both first.");
       return;
     }
 
@@ -58,7 +54,7 @@ function Home() {
       // TEXT MESSAGE
       // ========================================
 
-      if (messageType === "text") {
+      if (hasLetter) {
         content = letter.trim();
       }
 
@@ -66,7 +62,7 @@ function Home() {
       // DRAWING
       // ========================================
 
-      if (messageType === "drawing") {
+      if (hasDrawing) {
         const response = await fetch(drawing);
 
         if (!response.ok) {
@@ -88,13 +84,14 @@ function Home() {
           throw uploadError;
         }
 
-        // Get the actual public URL
-        const { data: publicUrlData } = supabase.storage
-          .from("secret-drawings")
-          .getPublicUrl(filePath);
-
-        imageUrl = publicUrlData.publicUrl;
+        imageUrl = filePath;
       }
+
+      const savedType = hasLetter && hasDrawing
+        ? "both"
+        : hasLetter
+          ? "text"
+          : "drawing";
 
       // ========================================
       // SAVE MESSAGE TO SUPABASE
@@ -104,9 +101,10 @@ function Home() {
         .from("messages")
         .insert({
           public_id: publicId,
-          type: messageType,
+          type: savedType,
           content,
           image_url: imageUrl,
+          sender_name: senderName.trim() || null,
         });
 
       if (databaseError) {
@@ -158,6 +156,16 @@ function Home() {
           <p className="subtitle">
             Leave a little secret for someone special.
           </p>
+
+          <label className="sender-name-field">
+            <span>Your initial or alias (optional)</span>
+            <input
+              value={senderName}
+              onChange={(event) => setSenderName(event.target.value)}
+              maxLength={40}
+              placeholder="Secret Admirer"
+            />
+          </label>
 
           <div className="home-buttons">
 
@@ -241,7 +249,7 @@ function Home() {
               />
 
               <span>
-                Switch to Draw
+                Add or edit a drawing
               </span>
             </button>
 
@@ -313,7 +321,7 @@ function Home() {
               />
 
               <span>
-                Switch to Letter
+                Add or edit a letter
               </span>
             </button>
 
@@ -346,6 +354,7 @@ function Home() {
       {showSendModal && (
         <SendModal
           messageId={messageId}
+          senderName={senderName}
           onClose={() => setShowSendModal(false)}
         />
       )}

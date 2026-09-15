@@ -213,6 +213,33 @@ svg {
   color: #7b5159;
 }
 
+.sender-name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(320px, 100%);
+  margin-top: 24px;
+  color: #87636b;
+  font: 12px Arial, sans-serif;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.sender-name-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e7cdd2;
+  border-radius: 10px;
+  background: #fff;
+  color: #35161d;
+  outline: none;
+}
+
+.sender-name-field input:focus {
+  border-color: #d93656;
+  box-shadow: 0 0 0 3px rgba(217, 54, 86, 0.08);
+}
+
 
 /* =========================================
    HOME BUTTONS
@@ -830,6 +857,13 @@ svg {
   white-space: pre-wrap;
 }
 
+.sender-label {
+  margin: -18px 0 24px;
+  color: #9b5d6b;
+  font: 13px Arial, sans-serif;
+  letter-spacing: 1px;
+}
+
 .received-drawing img {
   display: block;
 
@@ -842,6 +876,10 @@ svg {
   border-radius: 14px;
 
   border: 1px solid #eadcdf;
+}
+
+.received-drawing {
+  margin-top: 24px;
 }
 
 .receiver-footer {
@@ -899,6 +937,10 @@ svg {
 
   .main-action {
     width: 100%;
+  }
+
+  .sender-name-field {
+    width: min(300px, 100%);
   }
 
   .editor-page {

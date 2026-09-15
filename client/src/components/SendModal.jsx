@@ -13,7 +13,7 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function SendModal({ messageId, onClose }) {
+function SendModal({ messageId, senderName, onClose }) {
   const [mode, setMode] = useState(null);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -74,6 +74,7 @@ function SendModal({ messageId, onClose }) {
           body: JSON.stringify({
             email: email.trim(),
             messageId,
+            senderName: senderName.trim() || "Secret Admirer",
           }),
         }
       );

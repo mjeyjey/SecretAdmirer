@@ -3,6 +3,15 @@ const nodemailer = require("nodemailer");
 
 const router = express.Router();
 
+const escapeHtml = (value) =>
+  value.replace(/[&<>'"]/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    '"': "&quot;",
+  })[character]);
+
 const sendWithResend = async ({ email, messageLink, html }) => {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -57,7 +66,7 @@ const sendWithBrevo = async ({ email, html }) => {
 
 router.post("/send-email", async (req, res) => {
   try {
-    const { email, messageId } = req.body;
+    const { email, messageId, senderName } = req.body;
 
     const usingBrevo = Boolean(
       process.env.BREVO_API_KEY && process.env.EMAIL_FROM
@@ -102,6 +111,9 @@ router.post("/send-email", async (req, res) => {
 
     const messageLink =
       `${process.env.CLIENT_URL}/message/${messageId}`;
+    const displayName = escapeHtml(
+      senderName?.trim() || "Secret Admirer"
+    );
 
     const html = `
         <div style="
@@ -122,8 +134,8 @@ router.post("/send-email", async (req, res) => {
             font-size: 18px;
             color: #555;
           ">
-            You have received a message from
-            a Secret Admirer!
+            You have a message from
+            ${displayName}.
           </p>
 
           <a
