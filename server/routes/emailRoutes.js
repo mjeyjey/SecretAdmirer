@@ -3,11 +3,38 @@ const nodemailer = require("nodemailer");
 
 const router = express.Router();
 
+const sendWithResend = async ({ email, messageLink, html }) => {
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: process.env.EMAIL_FROM,
+      to: [email],
+      subject: "You have a secret message 💌",
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    const error = new Error(`Resend rejected the email: ${details}`);
+    error.code = `RESEND_${response.status}`;
+    throw error;
+  }
+};
+
 router.post("/send-email", async (req, res) => {
   try {
     const { email, messageId } = req.body;
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    const usingResend = Boolean(
+      process.env.RESEND_API_KEY && process.env.EMAIL_FROM
+    );
+
+    if (!usingResend && (!process.env.EMAIL_USER || !process.env.EMAIL_PASS)) {
       return res.status(500).json({
         message: "Email service is not configured on the server.",
       });
@@ -30,29 +57,7 @@ router.post("/send-email", async (req, res) => {
     const messageLink =
       `${process.env.CLIENT_URL}/message/${messageId}`;
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-
-      from: `"Secret Admirer" <${process.env.EMAIL_USER}>`,
-
-      to: email,
-
-      subject: "You have a secret message 💌",
-
-      html: `
+    const html = `
         <div style="
           font-family: Arial, sans-serif;
           max-width: 600px;
@@ -98,8 +103,32 @@ router.post("/send-email", async (req, res) => {
           </p>
 
         </div>
-      `,
-    });
+      `;
+
+    if (usingResend) {
+      await sendWithResend({ email, messageLink, html });
+    } else {
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"Secret Admirer" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "You have a secret message 💌",
+        html,
+      });
+    }
 
     res.json({
       message: "Email sent successfully.",
@@ -117,12 +146,15 @@ router.post("/send-email", async (req, res) => {
     const authenticationFailed =
       error.code === "EAUTH" || error.responseCode === 535;
     const connectionTimedOut = error.code === "ETIMEDOUT";
+    const resendFailed = error.code?.startsWith("RESEND_");
 
     res.status(500).json({
       message: authenticationFailed
         ? "Email authentication failed. Check the Gmail app password on the server."
         : connectionTimedOut
           ? "The email provider could not be reached from the hosting server."
+        : resendFailed
+          ? "The email provider rejected the message. Check the Resend sender address and API key."
         : `Email provider could not send the message (${error.code || "unknown error"}).`,
     });
 
