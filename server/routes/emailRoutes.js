@@ -22,6 +22,35 @@ const sendWithResend = async ({ email, messageLink, html }) => {
     const details = await response.text();
     const error = new Error(`Resend rejected the email: ${details}`);
     error.code = `RESEND_${response.status}`;
+    error.providerDetails = details;
+    throw error;
+  }
+};
+
+const sendWithBrevo = async ({ email, html }) => {
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": process.env.BREVO_API_KEY,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: {
+        name: "Secret Admirer",
+        email: process.env.EMAIL_FROM,
+      },
+      to: [{ email }],
+      subject: "You have a secret message 💌",
+      htmlContent: html,
+    }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    const error = new Error(`Brevo rejected the email: ${details}`);
+    error.code = `BREVO_${response.status}`;
+    error.providerDetails = details;
     throw error;
   }
 };
@@ -30,8 +59,11 @@ router.post("/send-email", async (req, res) => {
   try {
     const { email, messageId } = req.body;
 
+    const usingBrevo = Boolean(
+      process.env.BREVO_API_KEY && process.env.EMAIL_FROM
+    );
     const usingResend = Boolean(
-      process.env.RESEND_API_KEY && process.env.EMAIL_FROM
+      !usingBrevo && process.env.RESEND_API_KEY && process.env.EMAIL_FROM
     );
 
     if (!usingResend && (!process.env.EMAIL_USER || !process.env.EMAIL_PASS)) {
@@ -105,7 +137,9 @@ router.post("/send-email", async (req, res) => {
         </div>
       `;
 
-    if (usingResend) {
+    if (usingBrevo) {
+      await sendWithBrevo({ email, html });
+    } else if (usingResend) {
       await sendWithResend({ email, messageLink, html });
     } else {
       const transporter = nodemailer.createTransport({
@@ -147,6 +181,7 @@ router.post("/send-email", async (req, res) => {
       error.code === "EAUTH" || error.responseCode === 535;
     const connectionTimedOut = error.code === "ETIMEDOUT";
     const resendFailed = error.code?.startsWith("RESEND_");
+    const brevoFailed = error.code?.startsWith("BREVO_");
 
     res.status(500).json({
       message: authenticationFailed
@@ -154,7 +189,9 @@ router.post("/send-email", async (req, res) => {
         : connectionTimedOut
           ? "The email provider could not be reached from the hosting server."
         : resendFailed
-          ? "The email provider rejected the message. Check the Resend sender address and API key."
+          ? `Resend rejected the message: ${error.providerDetails || "Check the sender address and API key."}`
+        : brevoFailed
+          ? `Brevo rejected the message: ${error.providerDetails || "Check the sender address and API key."}`
         : `Email provider could not send the message (${error.code || "unknown error"}).`,
     });
 
