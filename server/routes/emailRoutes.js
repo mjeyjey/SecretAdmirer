@@ -2,6 +2,7 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 
 const router = express.Router();
+const emailSubject = "You received a private message";
 
 const escapeHtml = (value) =>
   value.replace(/[&<>'"]/g, (character) => ({
@@ -12,7 +13,7 @@ const escapeHtml = (value) =>
     '"': "&quot;",
   })[character]);
 
-const sendWithResend = async ({ email, messageLink, html }) => {
+const sendWithResend = async ({ email, messageLink, html, text }) => {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -22,8 +23,9 @@ const sendWithResend = async ({ email, messageLink, html }) => {
     body: JSON.stringify({
       from: process.env.EMAIL_FROM,
       to: [email],
-      subject: "You have a secret message 💌",
+      subject: emailSubject,
       html,
+      text,
     }),
   });
 
@@ -36,7 +38,7 @@ const sendWithResend = async ({ email, messageLink, html }) => {
   }
 };
 
-const sendWithBrevo = async ({ email, html }) => {
+const sendWithBrevo = async ({ email, html, text }) => {
   const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
@@ -50,8 +52,9 @@ const sendWithBrevo = async ({ email, html }) => {
         email: process.env.EMAIL_FROM,
       },
       to: [{ email }],
-      subject: "You have a secret message 💌",
+      subject: emailSubject,
       htmlContent: html,
+      textContent: text,
     }),
   });
 
@@ -162,11 +165,14 @@ router.post("/send-email", async (req, res) => {
 
         </div>
       `;
+    const text = `You received a private message from ${senderName?.trim() || "Secret Admirer"}.
+
+Open it here: ${messageLink}`;
 
     if (usingBrevo) {
-      await sendWithBrevo({ email, html });
+      await sendWithBrevo({ email, html, text });
     } else if (usingResend) {
-      await sendWithResend({ email, messageLink, html });
+      await sendWithResend({ email, messageLink, html, text });
     } else {
       const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -185,8 +191,9 @@ router.post("/send-email", async (req, res) => {
       await transporter.sendMail({
         from: `"Secret Admirer" <${process.env.EMAIL_USER}>`,
         to: email,
-        subject: "You have a secret message 💌",
+        subject: emailSubject,
         html,
+        text,
       });
     }
 
