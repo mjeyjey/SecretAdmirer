@@ -8,16 +8,28 @@ const emailRoutes = require("./routes/emailRoutes");
 const app = express();
 
 const PORT = process.env.PORT || 5000;
-const configuredClientUrl = process.env.CLIENT_URL?.trim();
-const clientUrl = configuredClientUrl
-  ? /^https?:\/\//i.test(configuredClientUrl)
-    ? configuredClientUrl
-    : `https://${configuredClientUrl}`
-  : undefined;
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://secret-admirer-orpin.vercel.app",
+];
 
 app.use(
   cors({
-    origin: clientUrl,
+    origin: function (origin, callback) {
+      // Allow requests without an Origin header
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -36,7 +48,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(
-    `Server running on http://localhost:${PORT}`
-  );
+  console.log(`Server running on port ${PORT}`);
 });
