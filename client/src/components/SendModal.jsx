@@ -1,6 +1,7 @@
 // SendModal.jsx
 
 import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 import {
   EnvelopeSimple,
@@ -61,6 +62,21 @@ function SendModal({ messageId, senderName, onClose }) {
     try {
       setLoading(true);
       setStatus("");
+
+      const { data: updatedMessage, error: databaseError } = await supabase
+        .from("messages")
+        .update({ recipient_email: email.trim() })
+        .eq("public_id", messageId)
+        .select("recipient_email")
+        .single();
+
+      if (databaseError) {
+        throw databaseError;
+      }
+
+      if (updatedMessage?.recipient_email !== email.trim()) {
+        throw new Error("The recipient email could not be saved.");
+      }
 
       const response = await fetch(
         `${API_URL}/send-email`,

@@ -4,6 +4,45 @@ const nodemailer = require("nodemailer");
 const router = express.Router();
 const emailSubject = "You received a private message";
 
+const saveRecipientEmail = async ({ email, messageId }) => {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const error = new Error(
+      "Supabase server credentials are not configured."
+    );
+    error.code = "SUPABASE_CONFIG_MISSING";
+    throw error;
+  }
+
+  const response = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/messages?public_id=eq.${encodeURIComponent(messageId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify({ recipient_email: email }),
+    }
+  );
+
+  if (!response.ok) {
+    const details = await response.text();
+    const error = new Error(`Supabase rejected the update: ${details}`);
+    error.code = `SUPABASE_${response.status}`;
+    throw error;
+  }
+
+  const updatedMessages = await response.json();
+
+  if (updatedMessages.length !== 1) {
+    const error = new Error("Message was not found in Supabase.");
+    error.code = "SUPABASE_MESSAGE_NOT_FOUND";
+    throw error;
+  }
+};
+
 const escapeHtml = (value) =>
   value.replace(/[&<>'"]/g, (character) => ({
     "&": "&amp;",
@@ -112,6 +151,11 @@ router.post("/send-email", async (req, res) => {
       });
     }
 
+    await saveRecipientEmail({
+      email,
+      messageId,
+    });
+
     const messageLink =
       `${process.env.CLIENT_URL}/message/${messageId}`;
     const displayName = escapeHtml(
@@ -215,6 +259,10 @@ Open it here: ${messageLink}`;
     const connectionTimedOut = error.code === "ETIMEDOUT";
     const resendFailed = error.code?.startsWith("RESEND_");
     const brevoFailed = error.code?.startsWith("BREVO_");
+    const supabaseFailed =
+      error.code === "SUPABASE_CONFIG_MISSING" ||
+      error.code === "SUPABASE_MESSAGE_NOT_FOUND" ||
+      error.code?.startsWith("SUPABASE_");
 
     res.status(500).json({
       message: authenticationFailed
@@ -225,6 +273,8 @@ Open it here: ${messageLink}`;
           ? `Resend rejected the message: ${error.providerDetails || "Check the sender address and API key."}`
         : brevoFailed
           ? `Brevo rejected the message: ${error.providerDetails || "Check the sender address and API key."}`
+        : supabaseFailed
+          ? `Supabase could not save the recipient email: ${error.message}`
         : `Email provider could not send the message (${error.code || "unknown error"}).`,
     });
 
